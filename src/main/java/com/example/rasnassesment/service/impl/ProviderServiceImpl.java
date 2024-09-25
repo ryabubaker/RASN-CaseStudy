@@ -7,8 +7,8 @@ import com.example.rasnassesment.entity.Provider;
 import com.example.rasnassesment.exceptions.ResourceNotFoundException;
 import com.example.rasnassesment.mapper.ProviderMapper;
 
-import com.example.rasnassesment.model.request.ProviderRequestDTO;
-import com.example.rasnassesment.model.response.ProviderResponseDTO;
+import com.example.rasnassesment.model.request.ProviderRequest;
+import com.example.rasnassesment.model.response.ProviderResponse;
 import com.example.rasnassesment.repository.ProviderRepository;
 import com.example.rasnassesment.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +27,20 @@ public class ProviderServiceImpl implements ProviderService {
     private ProviderMapper providerMapper;
 
     @Override
-    public ProviderResponseDTO createProvider(ProviderRequestDTO providerRequestDTO) {
-        Provider provider = providerMapper.toEntity(providerRequestDTO);
+    public ProviderResponse createProvider(ProviderRequest providerRequest) {
+        Provider provider = providerMapper.toEntity(providerRequest);
         Provider savedProvider = providerRepository.save(provider);
         return providerMapper.toResponseDTO(savedProvider);
     }
     @Override
-    public ProviderResponseDTO getProviderById(Long id) {
+    public ProviderResponse getProviderById(Long id) {
         Provider provider = providerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider not found"));
         return providerMapper.toResponseDTO(provider);
     }
 
     @Override
-    public List<ProviderResponseDTO> getAllProviders() {
+    public List<ProviderResponse> getAllProviders() {
         List<Provider> providers = providerRepository.findAll();
         return providers.stream()
                 .map(providerMapper::toResponseDTO)
@@ -48,11 +48,11 @@ public class ProviderServiceImpl implements ProviderService {
     }
 
     @Override
-    public ProviderResponseDTO updateProvider(Long id, ProviderRequestDTO providerRequestDTO) {
+    public ProviderResponse updateProvider(Long id, ProviderRequest providerRequest) {
         Provider existingProvider = providerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider not found"));
 
-        providerMapper.updateEntity(providerRequestDTO, existingProvider);
+        providerMapper.updateEntity(providerRequest, existingProvider);
         Provider updatedProvider = providerRepository.save(existingProvider);
 
         return providerMapper.toResponseDTO(updatedProvider);

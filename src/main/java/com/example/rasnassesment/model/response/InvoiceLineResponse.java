@@ -3,7 +3,7 @@ package com.example.rasnassesment.model.response;
 import lombok.Data;
 
 @Data
-public class InvoiceLineResponseDTO {
+public class InvoiceLineResponse {
     private String productName;
     private Integer quantity;
     private Double price;

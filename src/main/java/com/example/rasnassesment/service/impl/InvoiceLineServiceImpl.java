@@ -4,13 +4,13 @@ import com.example.rasnassesment.entity.Invoice;
 import com.example.rasnassesment.entity.InvoiceLine;
 import com.example.rasnassesment.exceptions.ResourceNotFoundException;
 import com.example.rasnassesment.mapper.InvoiceMapper;
-import com.example.rasnassesment.model.request.InvoiceLineRequestDTO;
-import com.example.rasnassesment.model.response.InvoiceLineResponseDTO;
-import com.example.rasnassesment.model.response.InvoiceResponseDTO;
+import com.example.rasnassesment.model.request.InvoiceLineRequest;
+import com.example.rasnassesment.model.response.InvoiceLineResponse;
+import com.example.rasnassesment.model.response.InvoiceResponse;
 import com.example.rasnassesment.repository.InvoiceLineRepository;
 import com.example.rasnassesment.repository.InvoiceRepository;
 import com.example.rasnassesment.service.InvoiceLineService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,92 +19,63 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceLineServiceImpl implements InvoiceLineService {
 
-    @Autowired
-    private InvoiceRepository invoiceRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final InvoiceLineRepository invoiceLineRepository;
+    private final InvoiceMapper invoiceMapper;
 
-    @Autowired
-    private InvoiceLineRepository invoiceLineRepository;
-
-    @Autowired
-    private InvoiceMapper invoiceMapper;
+    public InvoiceLineServiceImpl(InvoiceMapper invoiceMapper, InvoiceRepository invoiceRepository, InvoiceLineRepository invoiceLineRepository) {
+        this.invoiceMapper = invoiceMapper;
+        this.invoiceRepository = invoiceRepository;
+        this.invoiceLineRepository = invoiceLineRepository;
+    }
 
     @Override
-    public InvoiceResponseDTO addInvoiceLine(Long invoiceId, InvoiceLineRequestDTO dto) {
-        // Fetch the invoice
+    public InvoiceResponse addInvoiceLine(Long invoiceId, InvoiceLineRequest dto) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
 
-        // Map the DTO to an entity
         InvoiceLine invoiceLine = invoiceMapper.toEntity(dto);
         invoiceLine.setInvoice(invoice);
-        invoiceLine.setLineValue(invoiceLine.getQuantity() * invoiceLine.getPrice());
 
-        // Save the new invoice line
         invoiceLineRepository.save(invoiceLine);
 
-        // Update the invoice's total and remaining
-        updateInvoiceTotals(invoice);
-
-        // Return the response DTO
+        invoiceRepository.save(invoice);
         return invoiceMapper.toResponseDTO(invoice);
     }
 
     @Override
-    public InvoiceResponseDTO updateInvoiceLine(Long invoiceId, Long lineId, InvoiceLineRequestDTO dto) {
-        // Fetch the invoice line
+    public InvoiceResponse updateInvoiceLine(Long invoiceId, Long lineId, InvoiceLineRequest dto) {
         InvoiceLine invoiceLine = invoiceLineRepository.findById(lineId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice line not found"));
 
-        // Update the line details
-        invoiceLine.setProductName(dto.getProductName());
-        invoiceLine.setQuantity(dto.getQuantity());
-        invoiceLine.setPrice(dto.getPrice());
-        invoiceLine.setLineValue(invoiceLine.getQuantity() * invoiceLine.getPrice());
-
-        // Save the updated line
+        invoiceMapper.updateEntity(dto, invoiceLine);
         invoiceLineRepository.save(invoiceLine);
 
-        // Fetch the parent invoice and update its totals
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
-        updateInvoiceTotals(invoice);
-
-        // Return the updated response DTO
+        invoiceRepository.save(invoice);
         return invoiceMapper.toResponseDTO(invoice);
     }
 
     @Override
     public void deleteInvoiceLine(Long invoiceId, Long lineId) {
-        // Fetch the invoice line
         InvoiceLine invoiceLine = invoiceLineRepository.findById(lineId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice line not found"));
 
-        // Delete the line
         invoiceLineRepository.delete(invoiceLine);
 
-        // Fetch the parent invoice and update its totals
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
-        updateInvoiceTotals(invoice);
-    }
+        invoiceRepository.save(invoice);    }
 
     @Override
-    public List<InvoiceLineResponseDTO> getInvoiceLines(Long invoiceId) {
-        // Fetch all invoice lines associated with an invoice
+    public List<InvoiceLineResponse> getInvoiceLines(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
 
-        return invoice.getInvoiceLines().stream()
-                .map(invoiceMapper::toResponseDTO)
-                .collect(Collectors.toList());
+        return invoiceMapper.toInvoiceLineResponseDTOList(invoice.getInvoiceLines());
     }
 
-    private void updateInvoiceTotals(Invoice invoice) {
-        double total = invoice.getInvoiceLines().stream()
-                .mapToDouble(InvoiceLine::getLineValue)
-                .sum();
-        invoice.setTotal(total);
-        invoice.setRemaining(invoice.getPaid() - total);
-        invoiceRepository.save(invoice);
-    }
+
 }
+

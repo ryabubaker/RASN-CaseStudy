@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class InvoiceResponseDTO {
+public class InvoiceResponse {
     private Long id;
     private LocalDateTime dateTime;
     private String providerName;
@@ -15,7 +15,7 @@ public class InvoiceResponseDTO {
     private Double paid;
     private Double remaining;
     private String deliveredBy;
-    private List<InvoiceLineResponseDTO> invoiceLines;
+    private List<InvoiceLineResponse> invoiceLines;
 
 }
 

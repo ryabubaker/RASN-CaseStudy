@@ -1,10 +1,11 @@
 package com.example.rasnassesment.controller;
 
 
-import com.example.rasnassesment.model.request.ProviderRequestDTO;
+import com.example.rasnassesment.model.request.ProviderRequest;
 
-import com.example.rasnassesment.model.response.ProviderResponseDTO;
+import com.example.rasnassesment.model.response.ProviderResponse;
 import com.example.rasnassesment.service.ProviderService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/providers")
+@RequestMapping("providers")
 
 public class ProviderController {
 
@@ -23,26 +24,26 @@ public class ProviderController {
     }
 
     @PostMapping
-    public ResponseEntity<ProviderResponseDTO> createProvider(@RequestBody ProviderRequestDTO providerRequestDTO) {
-        ProviderResponseDTO responseDTO = providerService.createProvider(providerRequestDTO);
+    public ResponseEntity<ProviderResponse> createProvider(@Valid @RequestBody ProviderRequest providerRequest) {
+        ProviderResponse responseDTO = providerService.createProvider(providerRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProviderResponseDTO> getProviderById(@PathVariable Long id) {
-        ProviderResponseDTO providerResponseDTO = providerService.getProviderById(id);
-        return ResponseEntity.ok(providerResponseDTO);
+    public ResponseEntity<ProviderResponse> getProviderById(@PathVariable Long id) {
+        ProviderResponse providerResponse = providerService.getProviderById(id);
+        return ResponseEntity.ok(providerResponse);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProviderResponseDTO>> getAllProviders() {
-        List<ProviderResponseDTO> providers = providerService.getAllProviders();
+    public ResponseEntity<List<ProviderResponse>> getAllProviders() {
+        List<ProviderResponse> providers = providerService.getAllProviders();
         return ResponseEntity.ok(providers);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProviderResponseDTO> updateProvider(@PathVariable Long id, @RequestBody ProviderRequestDTO providerRequestDTO) {
-        ProviderResponseDTO updatedProvider = providerService.updateProvider(id, providerRequestDTO);
+    public ResponseEntity<ProviderResponse> updateProvider(@PathVariable Long id,@Valid @RequestBody ProviderRequest providerRequest) {
+        ProviderResponse updatedProvider = providerService.updateProvider(id, providerRequest);
         return ResponseEntity.ok(updatedProvider);
     }
 

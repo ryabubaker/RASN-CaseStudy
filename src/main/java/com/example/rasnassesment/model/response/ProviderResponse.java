@@ -3,7 +3,7 @@ package com.example.rasnassesment.model.response;
 import lombok.Data;
 
 @Data
-public class ProviderResponseDTO {
+public class ProviderResponse {
     private Long id;
     private String name;
     private String address;

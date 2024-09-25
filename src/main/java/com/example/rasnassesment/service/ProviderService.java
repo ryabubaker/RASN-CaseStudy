@@ -4,18 +4,18 @@ package com.example.rasnassesment.service;
 
 
 
-import com.example.rasnassesment.model.request.ProviderRequestDTO;
-import com.example.rasnassesment.model.response.ProviderResponseDTO;
+import com.example.rasnassesment.model.request.ProviderRequest;
+import com.example.rasnassesment.model.response.ProviderResponse;
 
 import java.util.List;
 
 
 public interface ProviderService {
 
-    ProviderResponseDTO createProvider(ProviderRequestDTO providerRequest);
-    ProviderResponseDTO getProviderById(Long id);
-    List<ProviderResponseDTO> getAllProviders();
-    ProviderResponseDTO updateProvider(Long id, ProviderRequestDTO providerRequestDTO);
+    ProviderResponse createProvider(ProviderRequest providerRequest);
+    ProviderResponse getProviderById(Long id);
+    List<ProviderResponse> getAllProviders();
+    ProviderResponse updateProvider(Long id, ProviderRequest providerRequest);
 
     void deleteProvider(Long id);
 
