@@ -35,7 +35,7 @@ public class Invoice {
     @Column(nullable = false)
     private String deliveredBy;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceLine> invoiceLines;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -33,8 +33,12 @@ public class InvoiceController {
         InvoiceResponse response = invoiceService.createInvoice(invoiceRequest);
         return ResponseEntity.ok(response);
     }
-
-
+    @PreAuthorize("hasAuthority('INVOICE_VIEW')")
+    @GetMapping
+    public ResponseEntity<Page<InvoiceResponse>> getAllInvoices(Pageable pageable) {
+        Page<InvoiceResponse> invoices = invoiceService.getAllInvoices(pageable);
+        return ResponseEntity.ok(invoices);
+    }
     @PreAuthorize("hasAuthority('INVOICE_VIEW')")
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceResponse> getInvoiceById(@PathVariable Long id) {

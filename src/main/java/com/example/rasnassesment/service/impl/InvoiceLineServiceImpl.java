@@ -57,18 +57,19 @@ public class InvoiceLineServiceImpl implements InvoiceLineService {
 
     @Override
     public InvoiceResponse deleteInvoiceLine(Long invoiceId, Long lineId) {
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
+
         InvoiceLine invoiceLine = invoiceLineRepository.findById(lineId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice line not found"));
 
         invoiceLineRepository.delete(invoiceLine);
 
-        Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
+        // Recalculate the totals
         updateInvoiceTotals(invoice);
+
         return invoiceMapper.toResponseDTO(invoice);
     }
-
-
 
 
 
@@ -78,6 +79,15 @@ public class InvoiceLineServiceImpl implements InvoiceLineService {
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
 
         return invoiceMapper.toInvoiceLineResponseDTOList(invoice.getInvoiceLines());
+    }
+
+    @Override
+    public InvoiceLineResponse getInvoiceLineById(Long invoiceId, Long lineId) {
+        invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
+        InvoiceLine invoiceLine = invoiceLineRepository.findById(lineId)
+                .orElseThrow(() -> new ResourceNotFoundException("InvoiceLine not found with id: " + lineId));
+        return invoiceMapper.toResponseDTO(invoiceLine);
     }
 
     private void updateInvoiceTotals(Invoice invoice) {

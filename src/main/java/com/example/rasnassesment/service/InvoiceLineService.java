@@ -11,4 +11,6 @@ public interface InvoiceLineService {
     InvoiceResponse updateInvoiceLine(Long invoiceId, Long lineId, InvoiceLineRequest dto);
     InvoiceResponse deleteInvoiceLine(Long invoiceId, Long lineId);
     List<InvoiceLineResponse> getInvoiceLines(Long invoiceId);
+
+    InvoiceLineResponse getInvoiceLineById(Long invoiceId, Long lineId);
 }

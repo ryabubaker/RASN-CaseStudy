@@ -10,13 +10,12 @@ import com.example.rasnassesment.model.response.InvoiceResponse;
 import com.example.rasnassesment.repository.InvoiceRepository;
 import com.example.rasnassesment.repository.ProviderRepository;
 import com.example.rasnassesment.service.InvoiceService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
@@ -38,17 +37,29 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = invoiceMapper.toEntity(invoiceRequest);
         invoice.setProvider(provider);
 
+        if (invoice.getInvoiceLines() != null) {
+            for (InvoiceLine line : invoice.getInvoiceLines()) {
+                line.setInvoice(invoice);
+            }
+        }
+
         Invoice savedInvoice = invoiceRepository.save(invoice);
         return invoiceMapper.toResponseDTO(savedInvoice);
     }
 
+    @Transactional
     @Override
     public InvoiceResponse getInvoiceById(Long id) {
         return invoiceRepository.findById(id)
                 .map(invoiceMapper::toResponseDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
     }
-
+    @Transactional
+    @Override
+    public Page<InvoiceResponse> getAllInvoices(Pageable pageable) {
+        Page<Invoice> invoices = invoiceRepository.findAll(pageable);
+        return invoices.map(invoiceMapper::toResponseDTO);
+    }
     @Override
     public InvoiceResponse updateInvoice(Long id, InvoiceRequest invoiceDTO) {
         Invoice invoice = invoiceRepository.findById(id)

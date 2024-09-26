@@ -42,8 +42,14 @@ public class InvoiceLineController {
     public ResponseEntity<InvoiceResponse> deleteInvoiceLine(@PathVariable Long invoiceId, @PathVariable Long lineId) {
         InvoiceResponse responseDTO = invoiceLineService.deleteInvoiceLine(invoiceId, lineId);
         return ResponseEntity.ok(responseDTO);
-    }
 
+    }
+    @PreAuthorize("hasAuthority('INVOICE_VIEW')")
+    @GetMapping("/{lineId}")
+    public ResponseEntity<InvoiceLineResponse> getInvoiceLineById(@PathVariable Long invoiceId,@PathVariable Long lineId) {
+        InvoiceLineResponse response = invoiceLineService.getInvoiceLineById(invoiceId, lineId);
+        return ResponseEntity.ok(response);
+    }
     @PreAuthorize("hasAuthority('INVOICE_VIEW')")
     @GetMapping
     public ResponseEntity<List<InvoiceLineResponse>> getInvoiceLines(@PathVariable Long invoiceId) {

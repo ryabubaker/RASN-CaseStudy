@@ -22,7 +22,8 @@ public interface InvoiceMapper {
     @Mapping(target = "dateTime", expression = "java(java.time.LocalDateTime.now())")  // Setting current date and time
     @Mapping(target = "total", expression = "java(invoiceRequest.getInvoiceLines() != null ? invoiceRequest.getInvoiceLines().stream().mapToDouble(line -> line.getQuantity() * line.getPrice()).sum() : 0.0)")  // Calculate total
     @Mapping(target = "remaining", expression = "java(invoiceRequest.getPaid() - (invoiceRequest.getInvoiceLines() != null ? invoiceRequest.getInvoiceLines().stream().mapToDouble(line -> line.getQuantity() * line.getPrice()).sum() : 0.0))")  // Calculate remaining
-    @Mapping(target = "provider", ignore = true)  // Provider is handled separately
+    @Mapping(target = "provider", ignore = true)
+    @Mapping(target = "invoiceLines", source = "invoiceRequest.invoiceLines")
     Invoice toEntity(InvoiceRequest invoiceRequest);
 
     // Mapping from InvoiceLineRequest to InvoiceLine entity, including lineValue calculation
