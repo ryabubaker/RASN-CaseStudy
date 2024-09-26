@@ -39,9 +39,9 @@ public class InvoiceLineController {
 
     @PreAuthorize("hasAuthority('INVOICE_DELETE')")
     @DeleteMapping("/{lineId}")
-    public ResponseEntity<Void> deleteInvoiceLine(@PathVariable Long invoiceId, @PathVariable Long lineId) {
-        invoiceLineService.deleteInvoiceLine(invoiceId, lineId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<InvoiceResponse> deleteInvoiceLine(@PathVariable Long invoiceId, @PathVariable Long lineId) {
+        InvoiceResponse responseDTO = invoiceLineService.deleteInvoiceLine(invoiceId, lineId);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PreAuthorize("hasAuthority('INVOICE_VIEW')")

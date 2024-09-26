@@ -10,11 +10,9 @@ import com.example.rasnassesment.model.response.InvoiceResponse;
 import com.example.rasnassesment.repository.InvoiceLineRepository;
 import com.example.rasnassesment.repository.InvoiceRepository;
 import com.example.rasnassesment.service.InvoiceLineService;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class InvoiceLineServiceImpl implements InvoiceLineService {
@@ -39,7 +37,7 @@ public class InvoiceLineServiceImpl implements InvoiceLineService {
 
         invoiceLineRepository.save(invoiceLine);
 
-        invoiceRepository.save(invoice);
+        updateInvoiceTotals(invoice);
         return invoiceMapper.toResponseDTO(invoice);
     }
 
@@ -58,7 +56,7 @@ public class InvoiceLineServiceImpl implements InvoiceLineService {
     }
 
     @Override
-    public void deleteInvoiceLine(Long invoiceId, Long lineId) {
+    public InvoiceResponse deleteInvoiceLine(Long invoiceId, Long lineId) {
         InvoiceLine invoiceLine = invoiceLineRepository.findById(lineId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice line not found"));
 
@@ -66,7 +64,13 @@ public class InvoiceLineServiceImpl implements InvoiceLineService {
 
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
-        invoiceRepository.save(invoice);    }
+        updateInvoiceTotals(invoice);
+        return invoiceMapper.toResponseDTO(invoice);
+    }
+
+
+
+
 
     @Override
     public List<InvoiceLineResponse> getInvoiceLines(Long invoiceId) {
@@ -74,6 +78,18 @@ public class InvoiceLineServiceImpl implements InvoiceLineService {
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
 
         return invoiceMapper.toInvoiceLineResponseDTOList(invoice.getInvoiceLines());
+    }
+
+    private void updateInvoiceTotals(Invoice invoice) {
+        double total = invoice.getInvoiceLines().stream()
+                .mapToDouble(InvoiceLine::getLineValue)
+                .sum();
+        invoice.setTotal(total);
+
+        double remaining = invoice.getPaid() - total;
+        invoice.setRemaining(remaining);
+
+        invoiceRepository.save(invoice);
     }
 
 

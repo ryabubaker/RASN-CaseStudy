@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@PreAuthorize("hasAuthority('USER_MANAGE')")
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -27,25 +27,26 @@ public class UserController {
         UserResponse createdUser = userService.createUser(userDetails);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
         UserResponse userResponse = userService.getUserByUserId(id);
         return ResponseEntity.ok(userResponse);
     }
 
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
-
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UserDetailsRequest userDetails) {
         UserResponse updatedUser = userService.updateUser(id, userDetails);
         return ResponseEntity.ok(updatedUser);
     }
-
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

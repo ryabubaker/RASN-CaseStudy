@@ -47,9 +47,8 @@ public interface InvoiceMapper {
     @Mapping(target = "remaining", expression = "java(invoice.getPaid() - (invoice.getInvoiceLines() != null ? invoice.getInvoiceLines().stream().mapToDouble(InvoiceLine::getLineValue).sum() : 0.0))")
     void updateEntity(InvoiceRequest invoiceDTO, @MappingTarget Invoice invoice);
 
-    @Mapping(target = "dateTime", ignore = true)
-    @Mapping(target = "total", expression = "java(invoice.getInvoiceLines() != null ? invoice.getInvoiceLines().stream().mapToDouble(InvoiceLine::getLineValue).sum() : 0.0)")
-    @Mapping(target = "remaining", expression = "java(invoice.getPaid() - (invoice.getInvoiceLines() != null ? invoice.getInvoiceLines().stream().mapToDouble(InvoiceLine::getLineValue).sum() : 0.0))")
-    void updateEntity(InvoiceLineRequest dto, InvoiceLine invoiceLine);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "lineValue", expression = "java(invoiceLineRequest.getQuantity() * invoiceLineRequest.getPrice())")
+    void updateEntity(InvoiceLineRequest invoiceLineRequest, @MappingTarget InvoiceLine invoiceLine);
 }
 

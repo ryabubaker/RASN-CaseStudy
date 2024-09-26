@@ -15,6 +15,7 @@ public class ProviderRequest {
     @NotBlank(message = "Phone number is mandatory")
     private String phone;
 
+    @NotBlank(message = "Service is mandatory")
     private String service;
     private String note;
 }
